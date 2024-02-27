@@ -7,7 +7,7 @@
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-   gap: 15px;
+   gap: 10px;
 }
 .item{ 
   display: flex;
@@ -15,6 +15,10 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 15px;
+
+  padding: 10px;
+  border-radius: 5px;
+  background-color: white;
 }
 .text{
   font-size: 24px;

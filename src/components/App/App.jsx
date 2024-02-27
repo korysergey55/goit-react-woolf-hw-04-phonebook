@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { useEffect, useState } from 'react'
 import { nanoid } from 'nanoid'
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -8,44 +8,33 @@ import ContactForm from '../contactForm/ContactForm';
 import ContactList from 'components/contactList/ContactList';
 import Filter from 'components/filter/Filter';
 
+const INITIAL_STATE = [{ id: "id-1", name: "Rosie Simpson", number: "459-12-56" }]
 
-class App extends Component {
+const App = () => {
+  const [contacts, setContacts] = useState(INITIAL_STATE)
+  const [filter, setFilter] = useState('')
 
-  state = {
-    contacts: [{ id: "id-1", name: "Rosie Simpson", number: "459-12-56" },
-    ],
-    filter: '',
-  }
 
-  componentDidMount() {
-    const localData = localStorage.getItem('contacts')
-    if (localData) {
-      this.setState({ contacts: JSON.parse(localData) })
+  useEffect(() => {
+    const LOCAL_DATA = localStorage.getItem('contacts')
+    if (LOCAL_DATA) {
+      setContacts(JSON.parse(LOCAL_DATA))
     }
-  }
+  }, [])
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.contacts.length !== this.state.contacts.length) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts))
-    }
-  }
-  createNewContact = (data) => {
-    if (!this.isNotDublicate(data)) return
-    const newContact = {
-      ...data,
-      id: nanoid()
-    }
-    this.setState((prev) => ({ ...prev, contacts: [...prev.contacts, newContact] }))
-  }
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts))
+  }, [contacts])
 
-  isNotDublicate = (data) => {
-    if (this.state.contacts.some((contact) => contact.name === data.name)) {
+
+  const isNotDublicate = (data) => {
+    if (contacts.some((contact) => contact.name === data.name)) {
       toast.error(`This Name - ${data.name} already exist!`, {
         theme: 'colored',
       })
       return false;
     }
-    if (this.state.contacts.some((contact) => contact.number === data.number)) {
+    if (contacts.some((contact) => contact.number === data.number)) {
       toast.error(`This Number - ${data.number} already exist!`, {
         theme: 'colored',
       })
@@ -54,53 +43,58 @@ class App extends Component {
     return true
   }
 
-  handleFilter = (evt) => {
-    this.setState({
-      [evt.target.name]: evt.target.value
-    })
+  const createNewContact = (data) => {
+    if (!isNotDublicate(data)) return
+    const newContact = {
+      ...data,
+      id: nanoid()
+    }
+    setContacts((prev) => ([...prev, newContact]))
+    setFilter('')
   }
 
-  handleDelete = (id) => {
-    this.setState((prev) => ({
-      prev, contacts: prev.contacts.filter((item) => item.id !== id)
-    }))
+  const handleFilter = (evt) => {
+    setFilter(evt.target.value)
   }
 
-  getFilteredContacts = () => {
-    return this.state.contacts.filter((item) =>
+  const handleDelete = (id) => {
+    setContacts(contacts.filter((item) => item.id !== id))
+  }
+
+  const getFilteredContacts = () => {
+    return contacts?.filter((item) =>
       item.name
         .toLocaleLowerCase()
         .trim()
-        .includes(this.state.filter.toLocaleLowerCase().trim()))
+        .includes(filter.toLocaleLowerCase().trim()))
   }
 
-  render() {
-    const filteredComtacts = this.getFilteredContacts()
 
-    return (
-      <div className={styles.container} >
+  const filteredComtacts = getFilteredContacts()
 
-        <h1 className={styles.title}>Phonebook</h1>
-        <ContactForm
-          createNewContact={this.createNewContact}
-        />
+  return (
+    <div className={styles.container} >
 
-        <h1 className={styles.title}>Contacts</h1>
-        <Filter
-          filter={this.state.filter}
-          handleFilter={this.handleFilter} />
+      <h1 className={styles.title}>Phonebook</h1>
+      <ContactForm
+        createNewContact={createNewContact}
+      />
 
-        <ContactList
-          contacts={filteredComtacts}
-          handleDelete={this.handleDelete}
-        />
+      <h1 className={styles.title}>Contacts</h1>
+      <Filter
+        filter={filter}
+        handleFilter={handleFilter} />
 
-        <ToastContainer
-          position="top-right"
-          autoClose={6000}
-        />
-      </div>
-    );
-  }
+      <ContactList
+        contacts={filteredComtacts}
+        handleDelete={handleDelete}
+      />
+
+      <ToastContainer
+        position="top-right"
+        autoClose={6000}
+      />
+    </div>
+  );
 };
 export { App }

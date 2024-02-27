@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './styles.module.css'
 
-const ContactList = ({ contacts, handleDelete, handleEdit }) => {
+const ContactList = ({ contacts, handleDelete }) => {
   return (
     <div className={styles.container}>
       {contacts ?
