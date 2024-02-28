@@ -8,24 +8,21 @@ import ContactForm from '../contactForm/ContactForm';
 import ContactList from 'components/contactList/ContactList';
 import Filter from 'components/filter/Filter';
 
-const INITIAL_STATE = [{ id: "id-1", name: "Rosie Simpson", number: "459-12-56" }]
-
 const App = () => {
-  const [contacts, setContacts] = useState(INITIAL_STATE)
   const [filter, setFilter] = useState('')
 
-
-  useEffect(() => {
-    const LOCAL_DATA = localStorage.getItem('contacts')
-    if (LOCAL_DATA) {
-      setContacts(JSON.parse(LOCAL_DATA))
+  const getLocalData = () => {
+    const localData = localStorage.getItem('contacts')
+    if (localData) {
+      return JSON.parse(localData)
     }
-  }, [])
+    return []
+  }
+  const [contacts, setContacts] = useState(() => getLocalData())
 
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts))
   }, [contacts])
-
 
   const isNotDublicate = (data) => {
     if (contacts.some((contact) => contact.name === data.name)) {
