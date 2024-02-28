@@ -25,7 +25,7 @@ const App = () => {
   }, [contacts])
 
   const isNotDublicate = (data) => {
-    if (contacts.some((contact) => contact.name === data.name)) {
+    if (contacts.some((contact) => contact.name.toLocaleLowerCase() === data.name.toLocaleLowerCase())) {
       toast.error(`This Name - ${data.name} already exist!`, {
         theme: 'colored',
       })
@@ -81,12 +81,12 @@ const App = () => {
       <Filter
         filter={filter}
         handleFilter={handleFilter} />
-
-      <ContactList
-        contacts={filteredComtacts}
-        handleDelete={handleDelete}
-      />
-
+      {filteredComtacts.length &&
+        < ContactList
+          contacts={filteredComtacts}
+          handleDelete={handleDelete}
+        />
+      }
       <ToastContainer
         position="top-right"
         autoClose={6000}
